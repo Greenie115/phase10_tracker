@@ -539,6 +539,15 @@
             height: 100%;
             overflow: hidden;
             pointer-events: none;
+            z-index: 1;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 2;
         }
         
         .flying-card {
@@ -940,6 +949,13 @@
                     
                     // Toggle active class on clicked tooltip
                     tooltip.classList.toggle('active');
+                    
+                    // Show or hide phase info based on tooltip state
+                    if (tooltip.closest('#score-section') && tooltip.classList.contains('active')) {
+                        document.getElementById('next-phase-info').style.display = 'block';
+                    } else if (tooltip.closest('#score-section') && !tooltip.classList.contains('active')) {
+                        document.getElementById('next-phase-info').style.display = 'none';
+                    }
                 });
             });
             
@@ -948,6 +964,9 @@
                 tooltips.forEach(tooltip => {
                     tooltip.classList.remove('active');
                 });
+                
+                // Hide phase info
+                document.getElementById('next-phase-info').style.display = 'none';
             });
         }
         
@@ -1288,7 +1307,12 @@
             // Display current phase info
             phaseTitle.textContent = `Current: Phase ${currentPhase}`;
             phaseDesc.textContent = phases[currentPhase - 1].desc;
-            nextPhaseInfo.style.display = 'block';
+            
+            // Show phase info when clicking the phase tooltip
+            const phaseTooltip = document.querySelector('.tooltip');
+            phaseTooltip.addEventListener('click', function() {
+                nextPhaseInfo.style.display = 'block';
+            });
             
             // If not at the last phase, also show next phase
             if (currentPhase < 10) {
