@@ -7,10 +7,11 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #e53935;
-            --secondary-color: #4CAF50;
-            --accent-color: #2196F3;
+            --primary-color: #e53935; /* Red */
+            --secondary-color: #4CAF50; /* Green */
+            --accent-color: #2196F3; /* Blue */
             --yellow-color: #FFC107;
+            --purple-color: #9C27B0;
             --bg-color: #f8f9fa;
             --card-bg: #ffffff;
             --text-color: #333333;
@@ -300,6 +301,18 @@
             color: white;
         }
         
+        .tab button.active[data-tab="Scoreboard"] {
+            background-color: var(--accent-color);
+        }
+        
+        .tab button.active[data-tab="PhaseGuide"] {
+            background-color: var(--secondary-color);
+        }
+        
+        .tab button.active[data-tab="History"] {
+            background-color: var(--purple-color);
+        }
+        
         .tabcontent {
             display: none;
             animation: fadeEffect 0.5s;
@@ -517,59 +530,78 @@
             background-color: #d32f2f;
         }
         
-        /* Animated Phase 10 Card */
-        .animated-card {
-            position: relative;
-            width: 60px;
-            height: 90px;
-            perspective: 1000px;
-            margin: 0 auto 15px auto;
-        }
-        
-        .card-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            text-align: center;
-            transition: transform 0.6s;
-            transform-style: preserve-3d;
-            animation: cardFloat 3s ease-in-out infinite;
-        }
-        
-        @keyframes cardFloat {
-            0% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-10px) rotate(5deg); }
-            100% { transform: translateY(0) rotate(0deg); }
-        }
-        
-        .card-front, .card-back {
+        /* Flying cards animation */
+        .flying-cards-container {
             position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            overflow: hidden;
+            pointer-events: none;
         }
         
-        .card-front {
-            background-color: #e53935;
+        .flying-card {
+            position: absolute;
+            width: 40px;
+            height: 60px;
+            border-radius: 5px;
+            animation: flyingCard 10s linear infinite;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            opacity: 0.8;
+        }
+        
+        .flying-card::before {
+            content: "10";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
             font-weight: bold;
+            font-size: 18px;
         }
         
-        .card-number {
-            font-size: 24px;
-            margin-bottom: 5px;
+        .flying-card.red {
+            background-color: var(--primary-color);
+            animation-duration: 7s;
         }
         
-        .card-text {
-            font-size: 12px;
-            text-transform: uppercase;
+        .flying-card.blue {
+            background-color: var(--accent-color);
+            animation-duration: 8s;
+        }
+        
+        .flying-card.green {
+            background-color: var(--secondary-color);
+            animation-duration: 9s;
+        }
+        
+        .flying-card.yellow {
+            background-color: var(--yellow-color);
+            animation-duration: 10s;
+        }
+        
+        .flying-card.purple {
+            background-color: var(--purple-color);
+            animation-duration: 11s;
+        }
+        
+        @keyframes flyingCard {
+            0% {
+                transform: translate(-50px, 50px) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.7;
+            }
+            90% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translate(calc(100% + 50px), calc(100% - 100px)) rotate(360deg);
+                opacity: 0;
+            }
         }
         
         .phase-indicator {
@@ -643,29 +675,24 @@
     <div id="notification" class="notification" aria-live="polite"></div>
     
     <div class="header">
-        <div class="animated-card">
-            <div class="card-inner">
-                <div class="card-front">
-                    <div class="card-number">10</div>
-                    <div class="card-text">Phase</div>
-                </div>
-            </div>
+        <div class="flying-cards-container" id="flying-cards-container">
+            <!-- Flying cards will be added here -->
         </div>
         <h1>Phase 10 Scorer</h1>
         <div class="confetti-container" id="confetti-container"></div>
     </div>
     
     <div class="tab">
-        <button class="tablinks active" onclick="openTab(event, 'Game')">
+        <button class="tablinks active" onclick="openTab(event, 'Game')" data-tab="Game">
             <i class="fas fa-gamepad"></i> Game
         </button>
-        <button class="tablinks" onclick="openTab(event, 'Scoreboard')">
+        <button class="tablinks" onclick="openTab(event, 'Scoreboard')" data-tab="Scoreboard">
             <i class="fas fa-trophy"></i> Scoreboard
         </button>
-        <button class="tablinks" onclick="openTab(event, 'PhaseGuide')">
+        <button class="tablinks" onclick="openTab(event, 'PhaseGuide')" data-tab="PhaseGuide">
             <i class="fas fa-book"></i> Phases
         </button>
-        <button class="tablinks" onclick="openTab(event, 'History')">
+        <button class="tablinks" onclick="openTab(event, 'History')" data-tab="History">
             <i class="fas fa-history"></i> History
         </button>
     </div>
@@ -687,7 +714,7 @@
         </div>
         
         <div class="card" id="score-section">
-           <h2>Add Score</h2>
+            <h2>Add Score</h2>
             <select id="player-select">
                 <option value="">Select player</option>
                 <!-- Player options will be added here dynamically -->
@@ -719,7 +746,7 @@
                 <h3>Card Value Calculator</h3>
                 <div class="card-inputs">
                     <div>
-                        <label for="skip-cards">Skip Cards (20 pts)</label>
+                        <label for="skip-cards">Skip Cards (15 pts)</label>
                         <input type="number" id="skip-cards" value="0" min="0" max="4" onchange="calculateCardTotal()">
                     </div>
                     <div>
@@ -864,6 +891,63 @@
                 if (e.key === 'Enter') {
                     document.getElementById('add-score-button').click();
                 }
+            });
+            
+            // Initialize flying cards
+            createFlyingCards();
+            
+            // Initialize tooltips
+            initTooltips();
+        }
+        
+        // Create flying cards animation
+        function createFlyingCards() {
+            const container = document.getElementById('flying-cards-container');
+            const colors = ['red', 'blue', 'green', 'yellow', 'purple'];
+            
+            for (let i = 0; i < 8; i++) {
+                const card = document.createElement('div');
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                card.className = `flying-card ${color}`;
+                
+                // Random starting positions and delays
+                const startX = Math.random() * 100;
+                const startY = Math.random() * 100;
+                const delay = Math.random() * 5;
+                
+                card.style.left = `${startX}%`;
+                card.style.top = `${startY}%`;
+                card.style.animationDelay = `${delay}s`;
+                
+                container.appendChild(card);
+            }
+        }
+        
+        // Initialize tooltips
+        function initTooltips() {
+            const tooltips = document.querySelectorAll('.tooltip');
+            
+            tooltips.forEach(tooltip => {
+                tooltip.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // Remove active class from all tooltips
+                    tooltips.forEach(t => {
+                        if (t !== tooltip) {
+                            t.classList.remove('active');
+                        }
+                    });
+                    
+                    // Toggle active class on clicked tooltip
+                    tooltip.classList.toggle('active');
+                });
+            });
+            
+            // Close tooltips when clicking elsewhere
+            document.addEventListener('click', function() {
+                tooltips.forEach(tooltip => {
+                    tooltip.classList.remove('active');
+                });
             });
         }
         
@@ -1074,7 +1158,7 @@
             const wildCards = parseInt(document.getElementById('wild-cards').value) || 0;
             const numberCards = parseInt(document.getElementById('number-cards').value) || 0;
             
-            const total = (skipCards * 20) + (wildCards * 25) + numberCards;
+            const total = (skipCards * 15) + (wildCards * 25) + numberCards;
             document.getElementById('card-total').textContent = total;
         }
         
@@ -1388,6 +1472,9 @@
             
             document.getElementById(tabName).className += ' visible';
             evt.currentTarget.className += ' active';
+            
+            // Store the last active tab
+            localStorage.setItem('lastActiveTab', tabName);
         }
         
         // Initialize the app
