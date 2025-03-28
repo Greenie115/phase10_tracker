@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 10 Scorer</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #e53935;
+            --secondary-color: #4CAF50;
+            --accent-color: #2196F3;
+            --yellow-color: #FFC107;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 15px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            letter-spacing: 1px;
+        }
+        
+        .header::before, .header::after {
+            content: "10";
+            position: absolute;
+            background-color: var(--card-bg);
+            color: var(--primary-color);
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            border-radius: 50%;
+            font-weight: bold;
+            top: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .header::before {
+            left: 15px;
+        }
+        
+        .header::after {
+            right: 15px;
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-top: 4px solid var(--primary-color);
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+        
+        .card h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card h2::before {
+            content: "•";
+            color: var(--primary-color);
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-weight: 600;
+        }
+        
+        button:hover {
+            background-color: #d32f2f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button.secondary {
+            background-color: var(--accent-color);
+        }
+        
+        button.secondary:hover {
+            background-color: #1976D2;
+        }
+        
+        button.danger {
+            background-color: #f44336;
+        }
+        
+        button.danger:hover {
+            background-color: #d32f2f;
+        }
+        
+        button.success {
+            background-color: var(--secondary-color);
+        }
+        
+        button.success:hover {
+            background-color: #388E3C;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 2px solid #ddd;
+            border-radius: 50px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            outline: none;
+        }
+        
+        input:focus, select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.2);
+        }
+        
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            user-select: none;
+        }
+        
+        .checkbox-container input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        
+        .player-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-left: 4px solid var(--accent-color);
+            position: relative;
+        }
+        
+        .player-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .player-info {
+            flex-grow: 1;
+        }
+        
+        .player-name {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .player-score {
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .player-phase {
+            font-weight: 600;
+            color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .player-phase::before {
+            content: "★";
+            color: var(--yellow-color);
+        }
+        
+        .player-actions {
+            display: flex;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .tab {
+            overflow: hidden;
+            border-radius: 50px;
+            background-color: #f1f1f1;
+            display: flex;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .tab button {
+            flex: 1;
+            background-color: #f1f1f1;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            color: var(--text-color);
+            margin: 0;
+            border-radius: 0;
+            font-weight: 600;
+            box-shadow: none;
+        }
+        
+        .tab button:first-child {
+            border-radius: 50px 0 0 50px;
+        }
+        
+        .tab button:last-child {
+            border-radius: 0 50px 50px 0;
+        }
+        
+        .tab button:hover {
+            background-color: #ddd;
+            transform: none;
+        }
+        
+        .tab button.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .tabcontent {
+            display: none;
+            animation: fadeEffect 0.5s;
+        }
+        
+        @keyframes fadeEffect {
+            from {opacity: 0;}
+            to {opacity: 1;}
+        }
+        
+        .visible {
+            display: block;
+        }
+        
+        .lead-player {
+            background-color: #FFF8E1 !important;
+            position: relative;
+        }
+        
+        .crown {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--yellow-color);
+            font-size: 20px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            animation: floating 2s infinite ease-in-out;
+        }
+        
+        @keyframes floating {
+            0% { transform: translateY(0) translateX(-50%); }
+            50% { transform: translateY(-5px) translateX(-50%); }
+            100% { transform: translateY(0) translateX(-50%); }
+        }
+        
+        .phase-guide-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .phase-item {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary-color);
+            transition: transform 0.2s;
+        }
+        
+        .phase-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .phase-number {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            font-size: 18px;
+        }
+        
+        .phase-description {
+            color: var(--text-color);
+        }
+        
+        .rules-summary {
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .rules-summary h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+        
+        .rules-summary ul {
+            padding-left: 20px;
+        }
+        
+        .rules-summary li {
+            margin-bottom: 8px;
+        }
+        
+        .winner-animation {
+            animation: winner-glow 2s infinite alternate;
+        }
+        
+        @keyframes winner-glow {
+            from { box-shadow: 0 0 10px rgba(255, 193, 7, 0.5); }
+            to { box-shadow: 0 0 20px rgba(255, 193, 7, 0.8); }
+        }
+        
+        .round-item {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .round-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .round-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        .dark-mode-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            cursor: pointer;
+            z-index: 1000;
+            transition: background-color 0.3s;
+        }
+        
+        .dark-mode-toggle:hover {
+            background-color: #d32f2f;
+        }
+        
+        body.dark-mode {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+        }
+        
+        body.dark-mode .tab {
+            background-color: #333;
+        }
+        
+        body.dark-mode .tab button {
+            background-color: #333;
+            color: #e0e0e0;
+        }
+        
+        body.dark-mode .tab button:hover {
+            background-color: #444;
+        }
+        
+        body.dark-mode .tab button.active {
+            background-color: #d32f2f;
+        }
+        
+        body.dark-mode .player-card,
+        body.dark-mode .phase-item,
+        body.dark-mode .round-item,
+        body.dark-mode .next-phase-info,
+        body.dark-mode .card-calculator,
+        body.dark-mode .rules-summary {
+            background-color: #2d2d2d;
+            border-color: #444;
+        }
+        
+        body.dark-mode input, 
+        body.dark-mode select {
+            background-color: #333;
+            color: #e0e0e0;
+            border-color: #555;
+        }
+        
+        body.dark-mode input::placeholder {
+            color: #999;
+        }
+        
+        body.dark-mode .phase-dot {
+            background-color: #555;
+        }
+        
+        body.dark-mode .phase-dot.active {
+            background-color: var(--secondary-color);
+        }
+        
+        body.dark-mode th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        body.dark-mode tr:nth-child(even) {
+            background-color: #2d2d2d;
+        }
+        
+        body.dark-mode tr:hover {
+            background-color: #3d3d3d;
+        }
+        
+        body.dark-mode .lead-player {
+            background-color: #4d3922 !important;
+        }
+        
+        body.dark-mode .checkbox-container {
+            color: #e0e0e0;
+        }
+        
+        body.dark-mode .header {
+            background-color: #d32f2f;
+        }
+        
+        /* Animated Phase 10 Card */
+        .animated-card {
+            position: relative;
+            width: 60px;
+            height: 90px;
+            perspective: 1000px;
+            margin: 0 auto 15px auto;
+        }
+        
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            animation: cardFloat 3s ease-in-out infinite;
+        }
+        
+        @keyframes cardFloat {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+        
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .card-front {
+            background-color: #e53935;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+        }
+        
+        .card-number {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .card-text {
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        
+        .phase-indicator {
+            display: flex;
+            margin-top: 15px;
+            justify-content: center;
+        }
+        
+        .phase-dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background-color: #ddd;
+            margin: 0 3px;
+        }
+        
+        .phase-dot.active {
+            background-color: var(--secondary-color);
+        }
+        
+        .game-card {
+            position: relative;
+            padding-left: 40px;
+        }
+        
+        .game-card::before {
+            content: "";
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 30px;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .no-players {
+            text-align: center;
+            padding: 20px;
+            color: #757575;
+            font-style: italic;
+        }
+        
+        .reset-game {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        @media (max-width: 480px) {
+            .header::before, .header::after {
+                display: none;
+            }
+            
+            .tab button {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dark-mode-toggle" onclick="toggleDarkMode()" aria-label="Toggle dark mode">
+        <i class="fas fa-moon"></i>
+    </div>
+    
+    <div class="undo-button" onclick="undoLastAction()" id="undo-button" style="display: none;" aria-label="Undo last action">
+        <i class="fas fa-undo"></i>
+    </div>
+    
+    <div id="notification" class="notification" aria-live="polite"></div>
+    
+    <div class="header">
+        <div class="animated-card">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="card-number">10</div>
+                    <div class="card-text">Phase</div>
+                </div>
+            </div>
+        </div>
+        <h1>Phase 10 Scorer</h1>
+        <div class="confetti-container" id="confetti-container"></div>
+    </div>
+    
+    <div class="tab">
+        <button class="tablinks active" onclick="openTab(event, 'Game')">
+            <i class="fas fa-gamepad"></i> Game
+        </button>
+        <button class="tablinks" onclick="openTab(event, 'Scoreboard')">
+            <i class="fas fa-trophy"></i> Scoreboard
+        </button>
+        <button class="tablinks" onclick="openTab(event, 'PhaseGuide')">
+            <i class="fas fa-book"></i> Phases
+        </button>
+        <button class="tablinks" onclick="openTab(event, 'History')">
+            <i class="fas fa-history"></i> History
+        </button>
+    </div>
+    
+    <div id="Game" class="tabcontent visible">
+        <div class="card" id="add-player-section">
+            <h2>Add Player</h2>
+            <input type="text" id="player-name" placeholder="Enter player name">
+            <button class="success" onclick="addPlayer()">
+                <i class="fas fa-user-plus"></i> Add Player
+            </button>
+        </div>
+        
+        <div class="card" id="players-list">
+            <h2>Players</h2>
+            <div id="players-container">
+                <!-- Players will be added here dynamically -->
+            </div>
+        </div>
+        
+        <div class="card" id="score-section">
+           <h2>Add Score</h2>
+            <select id="player-select">
+                <option value="">Select player</option>
+                <!-- Player options will be added here dynamically -->
+            </select>
+            <input type="number" id="hand-score" placeholder="Hand score (points to add)">
+            <div class="checkbox-container">
+                <input type="checkbox" id="completed-phase">
+                <label for="completed-phase">Completed current phase</label>
+                <div class="tooltip">
+                    <i class="fas fa-question-circle"></i>
+                    <span class="tooltiptext">Check this box if the player completed their current phase in this round</span>
+                </div>
+            </div>
+            <div id="next-phase-info" class="next-phase-info" style="margin: 10px 0; padding: 10px; background-color: #f5f5f5; border-radius: 5px; display: none;">
+                <div class="phase-title" style="font-weight: bold; margin-bottom: 5px;"></div>
+                <div class="phase-desc"></div>
+            </div>
+            
+            <div class="checkbox-container">
+                <input type="checkbox" id="show-calculator" onchange="toggleCardCalculator()">
+                <label for="show-calculator">Calculate card values</label>
+                <div class="tooltip">
+                    <i class="fas fa-question-circle"></i>
+                    <span class="tooltiptext">Use this to calculate score from cards</span>
+                </div>
+            </div>
+            
+            <div id="card-calculator" class="card-calculator">
+                <h3>Card Value Calculator</h3>
+                <div class="card-inputs">
+                    <div>
+                        <label for="skip-cards">Skip Cards (20 pts)</label>
+                        <input type="number" id="skip-cards" value="0" min="0" max="4" onchange="calculateCardTotal()">
+                    </div>
+                    <div>
+                        <label for="wild-cards">Wild Cards (25 pts)</label>
+                        <input type="number" id="wild-cards" value="0" min="0" max="8" onchange="calculateCardTotal()">
+                    </div>
+                    <div>
+                        <label for="number-cards">Number Cards (Face Value)</label>
+                        <input type="number" id="number-cards" placeholder="Total value" value="0" min="0" onchange="calculateCardTotal()">
+                    </div>
+                </div>
+                <div>
+                    <strong>Total Card Value: <span id="card-total">0</span></strong>
+                </div>
+                <button onclick="applyCardTotal()" class="secondary">
+                    <i class="fas fa-check"></i> Apply Total
+                </button>
+            </div>
+            
+            <button class="success" onclick="addScore()" id="add-score-button">
+                <i class="fas fa-plus-circle"></i> Add Score
+            </button>
+        </div>
+        
+        <div class="reset-game">
+            <button class="danger" onclick="resetGame()">
+                <i class="fas fa-redo-alt"></i> Reset Game
+            </button>
+        </div>
+    </div>
+    
+    <div id="Scoreboard" class="tabcontent">
+        <div class="card">
+            <h2>Scoreboard</h2>
+            <table id="scoreboard-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Player</th>
+                        <th>Phase</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody id="scoreboard-body">
+                    <!-- Scoreboard rows will be added here dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div id="PhaseGuide" class="tabcontent">
+        <div class="card">
+            <h2>Phase Guide</h2>
+            <div class="phase-guide-container">
+                <div class="phase-item">
+                    <div class="phase-number">Phase 1</div>
+                    <div class="phase-description">2 sets of 3</div>
+                </div>
+                <div class="phase-item">
+                    <div class="phase-number">Phase 2</div>
+                    <div class="phase-description">1 set of 3 + 1 run of 4</div>
+                </div>
+                <div class="phase-item">
+                    <div class="phase-number">Phase 3</div>
+                    <div class="phase-description">1 set of 4 + 1 run of 4</div>
+                </div>
+                <div class="phase-item">
+                    <div class="phase-number">Phase 4</div>
+                    <div class="phase-description">1 run of 7</div>
+                </div>
+                <div class="phase-item">
+                    <div class="phase-number">Phase 5</div>
+                    <div class="phase-description">1 run of 8</div>
+                </div>
+                <div class="phase-item">
+                    <div class="phase-number">Phase 6</div>
+                    <div class="phase-description">1 run of 9</div>
+                </div>
+                <div class="phase-item">
+                    <div class="phase-number">Phase 7</div>
+                    <div class="phase-description">2 sets of 4</div>
+                </div>
+                <div class="phase-item">
+                    <div class="phase-number">Phase 8</div>
+                    <div class="phase-description">7 cards of one color</div>
+                </div>
+                <div class="phase-item">
+                    <div class="phase-number">Phase 9</div>
+                    <div class="phase-description">1 set of 5 + 1 set of 2</div>
+                </div>
+                <div class="phase-item">
+                    <div class="phase-number">Phase 10</div>
+                    <div class="phase-description">1 set of 5 + 1 set of 3</div>
+                </div>
+            </div>
+            <div class="rules-summary">
+                <h3>Quick Rules</h3>
+                <ul>
+                    <li><strong>Set:</strong> Cards of the same number (e.g., three 5s)</li>
+                    <li><strong>Run:</strong> Cards in sequence (e.g., 3-4-5-6)</li>
+                    <li><strong>Skip cards and wilds can be used to complete phases</strong></li>
+                    <li>Lowest score wins</li>
+                    <li>First player to complete Phase 10 wins</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div id="History" class="tabcontent">
+        <div class="card">
+            <h2>Round History</h2>
+            <div id="history-container">
+                <!-- History will be added here dynamically -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Game state
+        let players = JSON.parse(localStorage.getItem('phase10Players')) || [];
+        let currentGameId = localStorage.getItem('currentGameId') || generateGameId();
+        let roundHistory = JSON.parse(localStorage.getItem('roundHistory')) || {};
+        let lastAction = null; // For undo functionality
+        
+        // Initialize the game
+        function init() {
+            localStorage.setItem('currentGameId', currentGameId);
+            renderPlayers();
+            renderPlayerSelect();
+            renderScoreboard();
+            renderHistory();
+            document.getElementById('Game').className = 'tabcontent visible';
+            
+            // Initialize dark mode if previously enabled
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+                document.querySelector('.dark-mode-toggle i').className = 'fas fa-sun';
+            }
+            
+            // Add enter key press to the hand-score input
+            document.getElementById('hand-score').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    document.getElementById('add-score-button').click();
+                }
+            });
+        }
+        
+        // Generate a unique game ID
+        function generateGameId() {
+            return 'game_' + Date.now();
+        }
+        
+        // Add a new player
+        function addPlayer() {
+            const playerNameInput = document.getElementById('player-name');
+            const playerName = playerNameInput.value.trim();
+            
+            if (playerName) {
+                const newPlayer = {
+                    id: Date.now().toString(),
+                    name: playerName,
+                    phase: 1,
+                    score: 0,
+                    gameId: currentGameId
+                };
+                
+                players.push(newPlayer);
+                savePlayers();
+                
+                playerNameInput.value = '';
+                renderPlayers();
+                renderPlayerSelect();
+                renderScoreboard();
+                
+                // Add a little animation effect
+                const playersContainer = document.getElementById('players-container');
+                playersContainer.lastChild.style.animation = 'fadeEffect 0.5s';
+            }
+        }
+        
+        // Add score to a player
+        function addScore() {
+            const playerSelect = document.getElementById('player-select');
+            const handScoreInput = document.getElementById('hand-score');
+            const completedPhaseCheckbox = document.getElementById('completed-phase');
+            
+            const playerId = playerSelect.value;
+            const handScore = parseInt(handScoreInput.value);
+            const completedPhase = completedPhaseCheckbox.checked;
+            
+            // Validation
+            if (!playerId) {
+                showNotification('Please select a player');
+                return;
+            }
+            
+            if (isNaN(handScore) || handScore < 0) {
+                showNotification('Please enter a valid score');
+                return;
+            }
+            
+            const playerIndex = players.findIndex(p => p.id === playerId);
+            
+            if (playerIndex !== -1) {
+                // Save previous state for undo
+                const previousPlayers = JSON.parse(JSON.stringify(players));
+                const previousRoundHistory = JSON.parse(JSON.stringify(roundHistory));
+                
+                const oldScore = players[playerIndex].score;
+                const oldPhase = players[playerIndex].phase;
+                
+                players[playerIndex].score += handScore;
+                
+                if (completedPhase && players[playerIndex].phase < 10) {
+                    players[playerIndex].phase += 1;
+                }
+                
+                // Add to round history
+                const roundId = Date.now().toString();
+                if (!roundHistory[currentGameId]) {
+                    roundHistory[currentGameId] = [];
+                }
+                
+                roundHistory[currentGameId].push({
+                    id: roundId,
+                    playerId: playerId,
+                    playerName: players[playerIndex].name,
+                    handScore: handScore,
+                    oldScore: oldScore,
+                    newScore: players[playerIndex].score,
+                    oldPhase: oldPhase,
+                    newPhase: players[playerIndex].phase,
+                    completedPhase: completedPhase,
+                    roundNumber: roundHistory[currentGameId].length + 1
+                });
+                
+                // Store the last action for undo
+                lastAction = {
+                    type: 'score',
+                    previousPlayers: previousPlayers,
+                    previousRoundHistory: previousRoundHistory
+                };
+                
+                // Save everything
+                savePlayers();
+                saveRoundHistory();
+                renderPlayers();
+                renderScoreboard();
+                renderHistory();
+                
+                // Show undo button
+                document.getElementById('undo-button').style.display = 'flex';
+                
+                // Check if someone has completed the game (Phase 10)
+                checkGameCompletion();
+                
+                handScoreInput.value = '';
+                completedPhaseCheckbox.checked = false;
+                
+                // Reset card calculator
+                document.getElementById('skip-cards').value = 0;
+                document.getElementById('wild-cards').value = 0;
+                document.getElementById('number-cards').value = 0;
+                document.getElementById('card-total').textContent = '0';
+                
+                // Show feedback
+                const playerName = players[playerIndex].name;
+                showNotification(`Added ${handScore} points to ${playerName}`);
+                
+                // Show feedback with color change
+                const scoreSection = document.getElementById('score-section');
+                const oldBg = scoreSection.style.backgroundColor;
+                scoreSection.style.backgroundColor = '#E8F5E9';
+                setTimeout(() => {
+                    scoreSection.style.backgroundColor = oldBg;
+                }, 300);
+            }
+        }
+        
+        // Check if someone has completed the game
+        function checkGameCompletion() {
+            const currentGamePlayers = players.filter(p => p.gameId === currentGameId);
+            const phaseCompleted = currentGamePlayers.some(player => player.phase === 10);
+            
+            if (phaseCompleted) {
+                // Find player with phase 10 and lowest score
+                const phaseCompletedPlayers = currentGamePlayers.filter(p => p.phase === 10);
+                const winner = phaseCompletedPlayers.reduce((lowest, player) => 
+                    player.score < lowest.score ? player : lowest, phaseCompletedPlayers[0]);
+                
+                // Show confetti for a winner!
+                createConfetti();
+                
+                // Highlight the winner with a special effect
+                setTimeout(() => {
+                    const rows = document.querySelectorAll('#scoreboard-table tbody tr');
+                    if (rows.length > 0) {
+                        rows[0].classList.add('winner-animation');
+                        
+                        // Show a congratulation message
+                        if (confirm(`${winner.name} has completed Phase 10 with a score of ${winner.score}! Game over.\n\nDo you want to start a new game?`)) {
+                            resetGame();
+                        }
+                    }
+                }, 500);
+            }
+        }
+        
+        // Create confetti animation
+        function createConfetti() {
+            const container = document.getElementById('confetti-container');
+            container.innerHTML = '';
+            
+            const colors = ['', 'blue', 'green', 'yellow'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = `confetti ${colors[Math.floor(Math.random() * colors.length)]}`;
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.animationDuration = `${3 + Math.random() * 4}s`;
+                confetti.style.animationDelay = `${Math.random() * 2}s`;
+                container.appendChild(confetti);
+            }
+            
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 7000);
+        }
+        
+        // Show notification
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Toggle card calculator
+        function toggleCardCalculator() {
+            const cardCalculator = document.getElementById('card-calculator');
+            const showCalculator = document.getElementById('show-calculator').checked;
+            
+            cardCalculator.style.display = showCalculator ? 'block' : 'none';
+        }
+        
+        // Calculate card total
+        function calculateCardTotal() {
+            const skipCards = parseInt(document.getElementById('skip-cards').value) || 0;
+            const wildCards = parseInt(document.getElementById('wild-cards').value) || 0;
+            const numberCards = parseInt(document.getElementById('number-cards').value) || 0;
+            
+            const total = (skipCards * 20) + (wildCards * 25) + numberCards;
+            document.getElementById('card-total').textContent = total;
+        }
+        
+        // Apply card total to score
+        function applyCardTotal() {
+            const total = parseInt(document.getElementById('card-total').textContent);
+            document.getElementById('hand-score').value = total;
+        }
+        
+        // Undo last action
+        function undoLastAction() {
+            if (!lastAction) {
+                return;
+            }
+            
+            if (lastAction.type === 'score') {
+                players = lastAction.previousPlayers;
+                roundHistory = lastAction.previousRoundHistory;
+                
+                savePlayers();
+                saveRoundHistory();
+                renderPlayers();
+                renderScoreboard();
+                renderHistory();
+                
+                showNotification('Last score entry undone');
+            }
+            
+            // Clear the last action
+            lastAction = null;
+            document.getElementById('undo-button').style.display = 'none';
+        }
+        
+        // Render the players list
+        function renderPlayers() {
+            const playersContainer = document.getElementById('players-container');
+            playersContainer.innerHTML = '';
+            
+            const currentGamePlayers = players.filter(p => p.gameId === currentGameId);
+            
+            if (currentGamePlayers.length === 0) {
+                playersContainer.innerHTML = '<div class="no-players"><i class="fas fa-users"></i> No players added yet.</div>';
+                return;
+            }
+            
+            for (const player of currentGamePlayers) {
+                const playerElement = document.createElement('div');
+                playerElement.className = 'player-card game-card';
+                
+                // Create phase dots
+                let phaseDots = '<div class="phase-indicator">';
+                for (let i = 1; i <= 10; i++) {
+                    phaseDots += `<div class="phase-dot ${i <= player.phase ? 'active' : ''}"></div>`;
+                }
+                phaseDots += '</div>';
+                
+                playerElement.innerHTML = `
+                    <div class="player-info">
+                        <div class="player-name">${player.name}</div>
+                        <div class="player-score"><i class="fas fa-star"></i> Score: ${player.score}</div>
+                        <div class="player-phase"><i class="fas fa-flag"></i> Phase ${player.phase}/10</div>
+                        ${phaseDots}
+                    </div>
+                    <div class="player-actions">
+                        <button class="danger" onclick="removePlayer('${player.id}')">
+                            <i class="fas fa-user-minus"></i>
+                        </button>
+                    </div>
+                `;
+                
+                playersContainer.appendChild(playerElement);
+            }
+        }
+        
+        // Render the player select dropdown
+        function renderPlayerSelect() {
+            const playerSelect = document.getElementById('player-select');
+            playerSelect.innerHTML = '<option value="">Select player</option>';
+            
+            const currentGamePlayers = players.filter(p => p.gameId === currentGameId);
+            
+            for (const player of currentGamePlayers) {
+                const option = document.createElement('option');
+                option.value = player.id;
+                option.textContent = `${player.name} (Phase ${player.phase})`;
+                playerSelect.appendChild(option);
+            }
+            
+            // Add event listener to show next phase info
+            playerSelect.addEventListener('change', showNextPhaseInfo);
+        }
+        
+        // Show information about the next phase
+        function showNextPhaseInfo() {
+            const playerSelect = document.getElementById('player-select');
+            const nextPhaseInfo = document.getElementById('next-phase-info');
+            const phaseTitle = nextPhaseInfo.querySelector('.phase-title');
+            const phaseDesc = nextPhaseInfo.querySelector('.phase-desc');
+            
+            if (!playerSelect.value) {
+                nextPhaseInfo.style.display = 'none';
+                return;
+            }
+            
+            const selectedPlayer = players.find(p => p.id === playerSelect.value);
+            if (!selectedPlayer) {
+                nextPhaseInfo.style.display = 'none';
+                return;
+            }
+            
+            const currentPhase = selectedPlayer.phase;
+            
+            // Define phases
+            const phases = [
+                { num: 1, desc: "2 sets of 3" },
+                { num: 2, desc: "1 set of 3 + 1 run of 4" },
+                { num: 3, desc: "1 set of 4 + 1 run of 4" },
+                { num: 4, desc: "1 run of 7" },
+                { num: 5, desc: "1 run of 8" },
+                { num: 6, desc: "1 run of 9" },
+                { num: 7, desc: "2 sets of 4" },
+                { num: 8, desc: "7 cards of one color" },
+                { num: 9, desc: "1 set of 5 + 1 set of 2" },
+                { num: 10, desc: "1 set of 5 + 1 set of 3" }
+            ];
+            
+            // Display current phase info
+            phaseTitle.textContent = `Current: Phase ${currentPhase}`;
+            phaseDesc.textContent = phases[currentPhase - 1].desc;
+            nextPhaseInfo.style.display = 'block';
+            
+            // If not at the last phase, also show next phase
+            if (currentPhase < 10) {
+                phaseDesc.textContent += ` — Next: Phase ${currentPhase + 1} (${phases[currentPhase].desc})`;
+            }
+        }
+        
+        // Render the scoreboard
+        function renderScoreboard() {
+            const scoreboardBody = document.getElementById('scoreboard-body');
+            scoreboardBody.innerHTML = '';
+            
+            const currentGamePlayers = players.filter(p => p.gameId === currentGameId);
+            
+            if (currentGamePlayers.length === 0) {
+                scoreboardBody.innerHTML = '<tr><td colspan="4" class="no-players"><i class="fas fa-users"></i> No players added yet.</td></tr>';
+                return;
+            }
+            
+            // Sort players by phase (descending) and then by score (ascending)
+            const sortedPlayers = [...currentGamePlayers].sort((a, b) => {
+                if (b.phase !== a.phase) {
+                    return b.phase - a.phase;
+                }
+                return a.score - b.score;
+            });
+            
+            for (let i = 0; i < sortedPlayers.length; i++) {
+                const player = sortedPlayers[i];
+                const row = document.createElement('tr');
+                
+                if (i === 0) {
+                    row.className = 'lead-player';
+                    row.innerHTML = `
+                        <td><div class="crown"><i class="fas fa-crown"></i></div>${i + 1}</td>
+                        <td>${player.name}</td>
+                        <td>${player.phase}/10</td>
+                        <td>${player.score}</td>
+                    `;
+                } else {
+                    row.innerHTML = `
+                        <td>${i + 1}</td>
+                        <td>${player.name}</td>
+                        <td>${player.phase}/10</td>
+                        <td>${player.score}</td>
+                    `;
+                }
+                
+                scoreboardBody.appendChild(row);
+            }
+        }
+        
+        // Remove a player
+        function removePlayer(playerId) {
+            if (confirm('Are you sure you want to remove this player?')) {
+                players = players.filter(p => p.id !== playerId);
+                savePlayers();
+                renderPlayers();
+                renderPlayerSelect();
+                renderScoreboard();
+            }
+        }
+        
+        // Reset the game
+        function resetGame() {
+            if (confirm('Are you sure you want to reset the game? This will remove all players and scores.')) {
+                // Option to keep the same players but reset scores
+                const keepPlayers = players.filter(p => p.gameId === currentGameId).length > 0 && 
+                                    confirm('Do you want to keep the same players but reset their scores?');
+                
+                if (keepPlayers) {
+                    // Keep the same players but reset scores and phases
+                    players = players.map(p => {
+                        if (p.gameId === currentGameId) {
+                            return {
+                                ...p,
+                                score: 0,
+                                phase: 1,
+                                gameId: generateGameId()
+                            };
+                        }
+                        return p;
+                    });
+                } else {
+                    // Remove all players from the current game
+                    players = players.filter(p => p.gameId !== currentGameId);
+                }
+                
+                // Generate a new game ID
+                currentGameId = generateGameId();
+                localStorage.setItem('currentGameId', currentGameId);
+                
+                // Save and render
+                savePlayers();
+                renderPlayers();
+                renderPlayerSelect();
+                renderScoreboard();
+                renderHistory();
+            }
+        }
+        
+        // Save players to local storage
+        function savePlayers() {
+            localStorage.setItem('phase10Players', JSON.stringify(players));
+        }
+        
+        // Save round history to local storage
+        function saveRoundHistory() {
+            localStorage.setItem('roundHistory', JSON.stringify(roundHistory));
+        }
+        
+        // Render the round history
+        function renderHistory() {
+            const historyContainer = document.getElementById('history-container');
+            historyContainer.innerHTML = '';
+            
+            const gameHistory = roundHistory[currentGameId] || [];
+            
+            if (gameHistory.length === 0) {
+                historyContainer.innerHTML = '<div class="no-players"><i class="fas fa-history"></i> No rounds played yet.</div>';
+                return;
+            }
+            
+            // Group by rounds
+            const rounds = [...gameHistory].sort((a, b) => b.roundNumber - a.roundNumber);
+            
+            // Create a heading
+            const heading = document.createElement('h3');
+            heading.textContent = 'Recent Rounds';
+            historyContainer.appendChild(heading);
+            
+            // Render each round
+            rounds.forEach(round => {
+                const roundElement = document.createElement('div');
+                roundElement.className = 'round-item';
+                
+                const phaseChange = round.newPhase > round.oldPhase ? 
+                    `<span style="color: var(--secondary-color);">Completed Phase ${round.oldPhase}</span>` : '';
+                
+                roundElement.innerHTML = `
+                    <div class="round-header">
+                        <span>Round ${round.roundNumber} - ${round.playerName}</span>
+                    </div>
+                    <div class="round-details">
+                        <div>Score: <strong>+${round.handScore}</strong></div>
+                        <div>Total: ${round.oldScore} → ${round.newScore}</div>
+                        <div>Phase: ${round.oldPhase} → ${round.newPhase}</div>
+                    </div>
+                    ${phaseChange}
+                `;
+                
+                historyContainer.appendChild(roundElement);
+            });
+        }
+        
+        // Toggle dark mode
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const darkModeEnabled = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', darkModeEnabled);
+            
+            const darkModeToggle = document.querySelector('.dark-mode-toggle i');
+            if (darkModeEnabled) {
+                darkModeToggle.className = 'fas fa-sun';
+            } else {
+                darkModeToggle.className = 'fas fa-moon';
+            }
+        }
+        
+        // Tab functionality
+        function openTab(evt, tabName) {
+            const tabcontent = document.getElementsByClassName('tabcontent');
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].className = tabcontent[i].className.replace(' visible', '');
+            }
+            
+            const tablinks = document.getElementsByClassName('tablinks');
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(' active', '');
+            }
+            
+            document.getElementById(tabName).className += ' visible';
+            evt.currentTarget.className += ' active';
+        }
+        
+        // Initialize the app
+        init();
+    </script>
+</body>
+</html>
